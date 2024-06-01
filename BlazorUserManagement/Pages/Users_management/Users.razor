@@ -1,0 +1,70 @@
+@page "/users_management"
+@inject NavigationManager NavigationManager
+@inject UserService _userService
+
+<h3>Список користувачів</h3>
+
+@if (users == null)
+{
+    <p><em>Завантаження користувачів...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Ім'я</th>
+                <th>Прізвище</th>
+                <th>Email</th>
+                <th>Дії</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in users)
+            {
+                <tr>
+                    <td>@user.FirstName</td>
+                    <td>@user.LastName</td>
+                    <td>@user.Email</td>
+                    <td>
+                        <button class="btn btn-primary" @onclick="@(() => EditUser(user.Id))">Редагувати</button>
+                        <button class="btn btn-danger" @onclick="@(() => DeleteUser(user.Id))">Видалити</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <button class="btn btn-success" @onclick="@AddUser">Додати користувача</button>
+}
+
+@code {
+    private List<User> users;
+
+    protected override async Task OnInitializedAsync()
+    {
+        users = await LoadUsers();
+    }
+
+    private async Task<List<User>> LoadUsers()
+    {
+        return await _userService.GetUsersAsync();
+    }
+
+    private void AddUser()
+    {
+        NavigationManager.NavigateTo("/users_management/add");
+    }
+
+    private void EditUser(int userId)
+    {
+        NavigationManager.NavigateTo($"/users_management/edit/{userId}");
+    }
+
+    private async Task DeleteUser(int userId)
+    {
+        await _userService.DeleteUserAsync(userId);
+        users = await LoadUsers();
+        await Task.Delay(2000); // Затримка на 2 секунди
+    }
+}

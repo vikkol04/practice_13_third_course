@@ -1,0 +1,65 @@
+@page "/users_management/edit/{userId:int}"
+@inject NavigationManager NavigationManager
+@inject UserService _userService
+
+<h3>Редагувати користувача</h3>
+
+@if (user == null)
+{
+    <p><em>Завантаження користувача...</em></p>
+}
+else
+{
+    <EditForm Model="@user" OnValidSubmit="@HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label for="FirstName">Ім'я:</label>
+            <InputText id="FirstName" @bind-Value="@user.FirstName" class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label for="LastName">Прізвище:</label>
+            <InputText id="LastName" @bind-Value="@user.LastName" class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label for="Email">Email:</label>
+            <InputText id="Email" @bind-Value="@user.Email" class="form-control" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Зберегти</button>
+        <button type="button" class="btn btn-secondary" @onclick="@Cancel">Скасувати</button>
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public int UserId { get; set; }
+
+    private User user;
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = await LoadUser(UserId);
+    }
+
+    private async Task<User> LoadUser(int userId)
+    {
+        return new User { Id = userId, FirstName = "Іван", LastName = "Іванов", Email = "ivan.ivanov@example.com" };
+    }
+
+    private async Task HandleValidSubmit()
+    {
+
+        await _userService.UpdateUserAsync(user);
+        NavigationManager.NavigateTo("/users_management");
+        await Task.Delay(2000); // Затримка на 2 секунди
+    }
+
+    private void Cancel()
+    {
+        NavigationManager.NavigateTo("/users_management");
+    }
+}

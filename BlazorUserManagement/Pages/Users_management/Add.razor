@@ -1,0 +1,44 @@
+@page "/users_management/add"
+@inject NavigationManager NavigationManager
+@inject UserService _userService
+
+<h3>Додати користувача</h3>
+
+<EditForm Model="@user" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="FirstName">Ім'я:</label>
+        <InputText id="FirstName" @bind-Value="@user.FirstName" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label for="LastName">Прізвище:</label>
+        <InputText id="LastName" @bind-Value="@user.LastName" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label for="Email">Email:</label>
+        <InputText id="Email" @bind-Value="@user.Email" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Додати</button>
+    <button type="button" class="btn btn-secondary" @onclick="@Cancel">Скасувати</button>
+</EditForm>
+
+@code {
+    private User user = new User();
+
+    private async Task HandleValidSubmit()
+    {
+        await _userService.AddUserAsync(user);
+        NavigationManager.NavigateTo("/users_management");
+        await Task.Delay(2000); // Затримка на 2 секунди
+    }
+
+    private void Cancel()
+    {
+        NavigationManager.NavigateTo("/users_management");
+    }
+}
